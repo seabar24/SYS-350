@@ -33,7 +33,7 @@ try:
 except Exception as e:
     print (e)
     exit(1)
-
+# gets current sessions details
 def currentSes():
     user=si.content.sessionManager.currentSession.userName
     ipaddr=si.content.sessionManager.currentSession.ipAddress
@@ -48,42 +48,46 @@ def VM():
         os.system('cls')
     else:
         os.system('clear')
-        
     datacenter=si.content.rootFolder.childEntity[0]
     vms=datacenter.vmFolder.childEntity
     print("\nEnter 'exit' to go back to main menu")
     vm_name=input("\nName a VM to Search for: ")
-    for i in vms:
-        if vm_name == i.name:
-            print(f"\nVM Name: {vm_name}")
-            vm=si.content.searchIndex.FindByInventoryPath(vm_name)
-            power=vm.runtime.powerState
-            print(f"\nPower State:{power}")
-            # power=vms(vm_name).summary.runtime.powerState
-            # cpu=vms(vm_name).summary.config.numCpu
-            # print(f"\nNumber of CPUs: {cpu}")
-            # memory=vms(vm_name).summary.config.memorySizeMB/1024
-            # memoryGB=memory*8
-            # print(f"\nMemory in GB: {memoryGB}")
-            # network=vms(vm_name).guest.ipAddress
-            # print(f"\nIP Address: {network}")
-            time.sleep(5)
-            VM()
-        elif vm_name == "":
-            print(i.name)
-            time.sleep(5)
-            VM()
-        elif vm_name == "exit":
-            main()
-        else:
-            print("\nYou wrong.")
-            time.sleep(2)
-            VM()
-    main()
 
+    matching_vms=[]
+
+    for vm in vms:
+        if vm_name == vm.name:
+            matching_vms.append(vm)
+
+    if matching_vms:
+        for i in matching_vms:
+            print(f"\nVM Name: {vm_name}")
+            power=i.runtime.powerState
+            print(f"\nPower State:{power}")
+            cpu=i.summary.config.numCpu
+            print(f"\nNumber of CPUs: {cpu}")
+            memory=i.summary.config.memorySizeMB/1024
+            print(f"\nMemory in GB: {memory}")
+            network=i.guest.ipAddress
+            print(f"\nIP Address: {network}")
+            time.sleep(5)
+            VM()
+    elif vm_name == "":
+        for i in vms:
+            print(i.name)
+        time.sleep(4)
+        VM()
+    elif vm_name == "exit":
+        main()
+    else:
+        print("\nYou wrong.")
+        time.sleep(2)
+        VM()
+    main()
+#Exits Program
 def exitFunction():
     exit()
-
+# Default if choice in main() is not one of the options
 def default_case():
     print("Nuh uh")
     time.sleep(2)
