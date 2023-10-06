@@ -1,2 +1,2 @@
-username="sean.adm"
-hostname="vcenter.sean.local"
+username=sean.adm
+hostname=vcenter.sean.local
