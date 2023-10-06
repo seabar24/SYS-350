@@ -42,7 +42,6 @@ def currentSes():
     print(f"Vcenter Server: {hostname}")
     time.sleep(5)
     main()
-
 # Checks if VM exists and prints VM info
 def VM():
     # Clears page
@@ -100,17 +99,81 @@ def default_case():
     time.sleep(2)
     main()
 
-# Main menu function
-def main():
+def VM_Opt():
+
+    # def finding_vm():
+    #     # Input for VM Name
+    #     datacenter=si.content.rootFolder.childEntity[0]
+    #     vms=datacenter.vmFolder.childEntity
+    #     print("\nEnter 'exit' to go back to main menu")
+    #     vm_name=input("\nName a VM to Power On: ")
+
+    #     matching_vms=[]
+    #     # If Vm exists, adds to the list
+    #     for vm in vms:
+    #         if vm_name == vm.name:
+    #             matching_vms.append(vm)
+
+
+    def powerOn():
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName a VM to Power On: ")
+
+        matching_vms=[]
+        # If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.PowerOn()
+                    print(f"Powering on {vm_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error powering on Vm: {e}")
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            powerOn()
+        VM_Opt()
     switch_dict = {
-        "1": currentSes,
-        "2": VM,
-        "3": exitFunction
+        "1": powerOn,
+        # "2": powerOff,
+        # "3": createSnap,
+        # "4": BacktoMain,
+
     }
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
-    choice=input("What would you like to look at?\n\n1: Current Session\n2: VM Information\n3: Exit Program\n\nChoice: ")
+    choice=input("What task would you like complete?\n\n1: Power On VM\n2: Power Off VM\n3: Create Snapshot\n4: Back to Main Menu\n\nChoice: ")
+    output=switch_dict.get(choice, default_case)()
+    VM_Opt()
+# Main menu function
+def main():
+    switch_dict = {
+        "1": currentSes,
+        "2": VM,
+        "3": exitFunction,
+        "4": VM_Opt
+        
+    }
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+    choice=input("What would you like to look at?\n\n1: Current Session\n2: VM Information\n3: Exit Program\n4: VM Options\n\nChoice: ")
     output=switch_dict.get(choice, default_case)()
 main()
