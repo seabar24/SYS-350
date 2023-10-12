@@ -147,11 +147,48 @@ def VM_Opt():
             time.sleep(2)
             powerOn()
         VM_Opt()
+    
+    def powerOff():
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName a VM to Power Off: ")
+
+        matching_vms=[]
+        # If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.PowerOff()
+                    print(f"Powering on {vm_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error powering on Vm: {e}")
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            powerOff()
+        VM_Opt()
+
+    def BacktoMain():
+        main()
+        
     switch_dict = {
         "1": powerOn,
-        # "2": powerOff,
+        "2": powerOff,
         # "3": createSnap,
-        # "4": BacktoMain,
+        "4": BacktoMain,
 
     }
     if os.name == 'nt':
