@@ -1,4 +1,5 @@
 from pyVim.connect import SmartConnect
+from pyVmomi import vim
 import getpass
 import ssl
 import os
@@ -101,20 +102,6 @@ def default_case():
 
 def VM_Opt():
 
-    # def finding_vm():
-    #     # Input for VM Name
-    #     datacenter=si.content.rootFolder.childEntity[0]
-    #     vms=datacenter.vmFolder.childEntity
-    #     print("\nEnter 'exit' to go back to main menu")
-    #     vm_name=input("\nName a VM to Power On: ")
-
-    #     matching_vms=[]
-    #     # If Vm exists, adds to the list
-    #     for vm in vms:
-    #         if vm_name == vm.name:
-    #             matching_vms.append(vm)
-
-
     def powerOn():
         # Input for VM Name
         datacenter=si.content.rootFolder.childEntity[0]
@@ -137,6 +124,7 @@ def VM_Opt():
                     return True
                 except Exception as e:
                     print(f"Error powering on Vm: {e}")
+                    time.sleep(3)
                     return False
         # Exits back to VM_Opt() if "exit" is typed
         elif vm_name == "exit":
@@ -169,7 +157,7 @@ def VM_Opt():
                     time.sleep(3)
                     return True
                 except Exception as e:
-                    print(f"Error powering on Vm: {e}")
+                    print(f"Error powering off Vm: {e}")
                     return False
         # Exits back to VM_Opt() if "exit" is typed
         elif vm_name == "exit":
@@ -181,36 +169,185 @@ def VM_Opt():
             powerOff()
         VM_Opt()
 
+    def createSnap():
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName the VM that you want to create a snapshot of: ")
+        snap_name=input("\nName of Snapshot: ")
+        descrip=input("\nDescription: ")
+
+        matching_vms=[]
+        # If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.CreateSnapshot(snap_name, descrip, memory=False, quiesce=False)
+                    print(f"Creating snapshot {snap_name} for {vm_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error creating snapshot for VM: {e}")
+                    time.sleep(3)
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            createSnap()
+        VM_Opt()
+
+    def Rename():
+
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName the VM that you want to rename: ")
+        new_name=input("\nEnter new name of VM: ")
+
+        matching_vms=[]
+        # If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.Rename_Task(newName=new_name)
+                    print(f"Renaming {vm_name} to {new_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error creating snapshot for VM: {e}")
+                    time.sleep(3)
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            Rename()
+        VM_Opt()
+
+    def TemplateVM():
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName the Template you want to clone from: ")
+        temp_vm=input("\nEnter name of new VM: ")
+
+        matching_vms=[]
+
+        clone_spec=vim.vm.CloneSpec()
+        clone_spec.location = vim.vm.RelocateSpec(datastore=None, host=None, pool=None, diskMoveType="createNewChildDiskBacking")
+        clone_folder=datacenter.vmFolder
+        #If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.CloneVM_Task(folder=clone_folder, name=temp_vm, spec=clone_spec)
+                    print(f"Cloning VM from {vm_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error creating snapshot for VM: {e}")
+                    time.sleep(3)
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            Rename()
+        VM_Opt()
+
+    def DeleteVM():
+        # Input for VM Name
+        datacenter=si.content.rootFolder.childEntity[0]
+        vms=datacenter.vmFolder.childEntity
+        print("\nEnter 'exit' to go back to VM Option menu")
+        vm_name=input("\nName the VM that you want to Delete: ")
+
+        matching_vms=[]
+        # If Vm exists, adds to the list
+        for vm in vms:
+            if vm_name == vm.name:
+                matching_vms.append(vm)
+        #prints out VM Info if VM name Exists
+        if matching_vms:
+            for i in matching_vms:
+                try:
+                    i.Destroy_Task()
+                    print(f"Deleting {vm_name}...")
+                    time.sleep(3)
+                    return True
+                except Exception as e:
+                    print(f"Error creating snapshot for VM: {e}")
+                    time.sleep(3)
+                    return False
+        # Exits back to VM_Opt() if "exit" is typed
+        elif vm_name == "exit":
+            VM_Opt()
+        # If something else besides VM Name or Exit, tells you straight up
+        else:
+            print("\nYou wrong.")
+            time.sleep(2)
+            DeleteVM()
+        VM_Opt()
+
     def BacktoMain():
         main()
         
     switch_dict = {
         "1": powerOn,
         "2": powerOff,
-        # "3": createSnap,
-        "4": BacktoMain,
+        "3": createSnap,
+        "4": Rename,
+        "5": TemplateVM,
+        "6": DeleteVM,
+        "7": BacktoMain
 
     }
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
-    choice=input("What task would you like complete?\n\n1: Power On VM\n2: Power Off VM\n3: Create Snapshot\n4: Back to Main Menu\n\nChoice: ")
+    choice=input("What task would you like complete?\n\n1: Power On VM\n2: Power Off VM\n3: Create Snapshot\n4: Rename VM\n5: Create a VM from a Template \n6: Delete a VM \n7: Back to Main Menu\nChoice: ")
     output=switch_dict.get(choice, default_case)()
     VM_Opt()
+
 # Main menu function
 def main():
     switch_dict = {
         "1": currentSes,
         "2": VM,
-        "3": exitFunction,
-        "4": VM_Opt
+        "3": VM_Opt,
+        "4": exitFunction
         
     }
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
-    choice=input("What would you like to look at?\n\n1: Current Session\n2: VM Information\n3: Exit Program\n4: VM Options\n\nChoice: ")
+    choice=input("What would you like to look at?\n\n1: Current Session\n2: VM Information\n3: VM Options\n4: Exit Program\n\nChoice: ")
     output=switch_dict.get(choice, default_case)()
 main()
