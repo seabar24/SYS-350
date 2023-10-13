@@ -251,9 +251,6 @@ def VM_Opt():
 
         matching_vms=[]
 
-        clone_spec=vim.vm.CloneSpec()
-        clone_spec.location = vim.vm.RelocateSpec(datastore=None, host=None, pool=None, diskMoveType="createNewChildDiskBacking")
-        clone_folder=datacenter.vmFolder
         #If Vm exists, adds to the list
         for vm in vms:
             if vm_name == vm.name:
@@ -262,12 +259,23 @@ def VM_Opt():
         if matching_vms:
             for i in matching_vms:
                 try:
+                    relocate_spec=vim.vm.RelocateSpec()
+                    relocate_spec.diskMoveType='createNewChildDiskBacking'
+                    pool=GetResourcePools(dc.hostFolder.childEntity[4],resourcePool)
+                    # print({pool.name})
+                    # time.sleep(30)
+                    # relocate_spec.pool=
+                    # print({vm.resourcePool})
+                    # time.sleep(30)
+                    clone_spec=vim.vm.CloneSpec()
+                    clone_spec.location=relocate_spec
+                    clone_folder=datacenter.vmFolder
                     i.CloneVM_Task(folder=clone_folder, name=temp_vm, spec=clone_spec)
                     print(f"Cloning VM from {vm_name}...")
                     time.sleep(3)
                     return True
                 except Exception as e:
-                    print(f"Error creating snapshot for VM: {e}")
+                    print(f"Error creating clone from Template: {e}")
                     time.sleep(3)
                     return False
         # Exits back to VM_Opt() if "exit" is typed
