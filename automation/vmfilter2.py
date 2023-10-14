@@ -261,12 +261,10 @@ def VM_Opt():
                 try:
                     relocate_spec=vim.vm.RelocateSpec()
                     relocate_spec.diskMoveType='createNewChildDiskBacking'
-                    pool=GetResourcePools(dc.hostFolder.childEntity[4],resourcePool)
-                    # print({pool.name})
-                    # time.sleep(30)
-                    # relocate_spec.pool=
-                    # print({vm.resourcePool})
-                    # time.sleep(30)
+                    dest_resource_pool=i.resourcePool
+                    relocate_spec.pool=dest_resource_pool
+                    print({vm.resourcePool})
+                    time.sleep(5)
                     clone_spec=vim.vm.CloneSpec()
                     clone_spec.location=relocate_spec
                     clone_folder=datacenter.vmFolder
