@@ -9,3 +9,5 @@
 [Milestone 4.1](https://github.com/seabar24/SYS-350/wiki/Milestone-4.1)
 
 [Milestone 5.1](https://github.com/seabar24/SYS-350/wiki/Milestone-5.1)
+
+[Milestone 6.1](https://github.com/seabar24/SYS-350/wiki/Milestone-6.1)
