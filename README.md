@@ -14,3 +14,5 @@
 [Milestone 6.1](https://github.com/seabar24/SYS-350/wiki/Milestone-6.1)
 
 [Milestone 7](https://github.com/seabar24/SYS-350/wiki/Milestone-7)
+
+[Milestone 8](https://github.com/seabar24/SYS-350/wiki/Milestone-8)
