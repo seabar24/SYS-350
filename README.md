@@ -22,3 +22,5 @@
 [Milestone 10](https://github.com/seabar24/SYS-350/wiki/Milestone-10)
 
 [Milestone 11](https://github.com/seabar24/SYS-350/wiki/Milestone-11)
+
+[Milestone 12](https://github.com/seabar24/SYS-350/wiki/Milestone-12)
