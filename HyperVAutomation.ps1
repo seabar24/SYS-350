@@ -143,11 +143,8 @@ function checkVM ($VM) {
                 foreach ($network in $networks) {
                     Write-Host "Network Name: $($network.Name)"
                     Write-Host "Switch Type: $($network.SwitchType)"
-<<<<<<< HEAD
-=======
                     $isolationType = (Get-WmiObject -Namespace "Root\Virtualization\v2" -Query "SELECT * FROM Msvm_VirtualSwitch WHERE Name='$($network.Name)'").IsolationType
                     Write-Host "Isolation Type: $($isolationType)"
->>>>>>> 52d8ae9d0b87ab33474bbf11789f64d53a1f7cc4
                     $VMConnect = Get-VM | Where-Object { $_.NetworkAdapters | ForEach-Object { $_.SwitchId -eq $network.Id } } | ForEach-Object { $_.Name }
                     Write-Host "Connected VMs: $($VMConnect -join ', ')"
                     Write-Host "-----------------------"
