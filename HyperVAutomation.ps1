@@ -90,7 +90,6 @@ function checkVM ($VM) {
         # Snapshot VMs
             cls
             $VMName = Read-Host -Prompt "Enter the name of the VM you want to create a Snapshot of"
-            cls
             $SnapShot = Read-Host -Prompt "Enter the name of your Snapshot"
             checkVM $VMName
 
@@ -143,8 +142,6 @@ function checkVM ($VM) {
                 foreach ($network in $networks) {
                     Write-Host "Network Name: $($network.Name)"
                     Write-Host "Switch Type: $($network.SwitchType)"
-                    $isolationType = (Get-WmiObject -Namespace "Root\Virtualization\v2" -Query "SELECT * FROM Msvm_VirtualSwitch WHERE Name='$($network.Name)'").IsolationType
-                    Write-Host "Isolation Type: $($isolationType)"
                     $VMConnect = Get-VM | Where-Object { $_.NetworkAdapters | ForEach-Object { $_.SwitchId -eq $network.Id } } | ForEach-Object { $_.Name }
                     Write-Host "Connected VMs: $($VMConnect -join ', ')"
                     Write-Host "-----------------------"
