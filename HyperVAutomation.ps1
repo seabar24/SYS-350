@@ -47,9 +47,6 @@ function checkVM ($VM) {
         Write-Host "The VM '$VM' doesn't exist!"
         sleep 3
         HyperV
-
-    } else {
-        continue
     }
 }
 
@@ -57,7 +54,26 @@ function checkVM ($VM) {
 
         "1" {
         # Summary View of VMs w/ IPs, Powerstate, and Name
-
+            cls
+            $vms = Get-VM
+            foreach ($vm in $vms) {
+                $formattedInfo = "Name: $vm.Name`nPower State: $vm.State`n`n"
+                Write-Host $formattedInfo
+                }
+            $vmchosen = Read-Host -Prompt "Enter the name of a VM you would like more info about"
+            checkVM $vmchosen
+        
+            cls
+            $listedInfo = @{
+                Name = $vmchosen.name
+                MemoryAssigned = $vmchosen.MemoryAssigned
+                ProcessorCount = $vmchosen.ProcessorCount
+                NetworkAdapters = $vmchosen.NetworkAdapters
+                Integrated_Services = $vmchosen.IntegrationServicesVersion
+            }
+            Write-Host $listedInfo
+            Read-Host "Press 'Enter' when you are Done"
+            HyperV
             }
 
         "2" {
@@ -65,16 +81,15 @@ function checkVM ($VM) {
             cls
             $VMName = Read-Host -Prompt "Enter the name of a VM you want to Power On"
             cls
-            checkVM($VMName)
+            checkVM $VMName
       
             Write-Host "Powering on $VMName..."
             Sleep 3
             Start-VM -Name $VMName
             Write-Host "Done!"
             Sleep 3
-            Read-Host "Press Enter when done"
-            #sleep 3
-            #cls
+            sleep 3
+            cls
             HyperV
             }
 
@@ -83,6 +98,8 @@ function checkVM ($VM) {
             cls
             $VMName = Read-Host -Prompt "Enter the name of a VM you want to Power Off"
             cls
+            checkVM $VMName
+
             Write-Host "Shutting Down $VMName..."
             Sleep 3
             Stop-VM -Name $VMName -Force
@@ -100,18 +117,23 @@ function checkVM ($VM) {
             cls
             $LinkedCloneName = Read-Host -Prompt "Enter the name of your Linked Clone VM"
             $VMPath = Read-Host -Prompt "Enter the path you wish to store your VM"
-            $VHDPath = Read-Host -Prompt "Enter the name"
+            $VHDPath = Read-Host -Prompt "Enter the path for your Virtual Hard Drive"
 
             Write-Host "Creating Linked Clone, wait a few moments..."
             Sleep 5
-            New-VM -Name $LinkedCloneName -Path C:\ProgramData\Microsoft\Windows\Hyper-V\ -VHDPath C:\Users\Public\Documents\Hyper-V\Virtual_hard_disks\winchild11.vhdx -Generation 2 -SwitchName "HyperV-WAN"
-            Write-Host "Done! VM: $LinkedCloneName will start in a few moments..."
-            Sleep 3
-            Start-VM -Name $LinkedCloneName
-            cls
-            Write-Host "$LinkedCloneName is running."
-            Write-Host " "
-            HyperV
+            New-VM -Name $LinkedCloneName -Path $VMPath -VHDPath $VHDPath -Generation 2 -SwitchName "HyperV-WAN"
+            $yn = Read-Host -Prompt "Done! Would you like to start your Linked Clone? (y/n)"
+            if ($yn -eq "^[yY]$") {
+                Write-Host "Powering on $LinkedCloneName..."
+                Sleep 3
+                Start-VM -Name $LinkedCloneName
+                cls
+                Write-Host "$LinkedCloneName is running."
+                Write-Host " "
+                HyperV
+            } else {
+                HyperV
+                }
             }
 
         "6" {
