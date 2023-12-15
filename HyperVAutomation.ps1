@@ -169,7 +169,7 @@ function checkVM ($VM) {
                     Write-Host "Network Name: $($network.Name)"
                     Write-Host "Switch Type: $($network.SwitchType)"
                     Write-Host "Isolation Type: $($network.AllowedTrafficTypes)"
-                    $VMConnect = $network | Get-VMNetworkAdapter | ForEach-Object { $_.VMName }
+                    $VMConnect = Get-VM | Where-Object { $_.NetworkAdapters | ForEach-Object { $_.SwitchId -eq $network.Id } } | ForEach-Object { $_.Name }
                     Write-Host "Connected VMs: $($VMConnect -join ', ')"
                     Write-Host "-----------------------"
                 }
