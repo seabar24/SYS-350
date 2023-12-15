@@ -55,23 +55,25 @@ function checkVM ($VM) {
         "1" {
         # Summary View of VMs w/ IPs, Powerstate, and Name
             cls
-            $vms = Get-VM
+            $vms = Get-VM | Select-Object Name, State
             foreach ($vm in $vms) {
-                $formattedInfo = "Name: $vm.Name`nPower State: $vm.State`n`n"
-                Write-Host $formattedInfo
+                Write-Host "Name: $($vm.Name)`nPower State: $($vm.State)`n`n"
                 }
             $vmchosen = Read-Host -Prompt "Enter the name of a VM you would like more info about"
             checkVM $vmchosen
-        
-            cls
-            $listedInfo = @{
-                Name = $vmchosen.name
-                MemoryAssigned = $vmchosen.MemoryAssigned
-                ProcessorCount = $vmchosen.ProcessorCount
-                NetworkAdapters = $vmchosen.NetworkAdapters
-                Integrated_Services = $vmchosen.IntegrationServicesVersion
-            }
-            Write-Host $listedInfo
+
+            $vmInfo = Get-VM -Name $vmchosen
+            $memory = $vmInfo.MemoryAssigned
+            $processor = $vmInfo.ProcessorCount
+            $network = $vmInfo.NetworkAdapters
+            $IntServ = $vmInfo.IntegrationServicesVersion
+            
+            Write-Host "Name = $vmchosen"
+            Write-Host "Memory Assigned = $memory"
+            Write-Host "Processor Count = $processor"
+            Write-Host "Network Adapters = $network"
+            Write-Host "Integrated Services = $IntServ"
+
             Read-Host "Press 'Enter' when you are Done"
             HyperV
             }
@@ -110,6 +112,18 @@ function checkVM ($VM) {
 
         "4" {
         # Snapshot VMs
+            cls
+            $VMName = Read-Host -Prompt "Enter the name of the VM you want to create a Snapshot of"
+            cls
+            $SnapShot = Read-Host -Prompt "Enter the name of your Snapshot"
+            checkVM $VMName
+
+            Write-Host "Creating Snapshot..."
+            Sleep 3
+            Checkpoint-VM -Name $VMName -SnapshotName $SnapShot
+            Write-Host "Done!"
+            sleep 3
+            HyperV
             }
 
         "5" {
@@ -138,6 +152,30 @@ function checkVM ($VM) {
 
         "6" {
         # Change the Network a VM is on
+            cls
+            $VMName = Read-Host -Prompt "Enter the name of a VM to change the network"
+            cls
+            checkVM $VMName
+
+            $networks = Get-VMSwitch
+            if ($networks.Count -eq 0) {
+
+                Write-Host "0 Networks Found."
+
+            } else {
+
+                Write-Host "List of Networks:`n"
+                foreach ($network in $networks) {
+                    Write-Host "Network Name: $($network.Name)"
+                    Write-Host "Switch Type: $($network.SwitchType)"
+                    Write-Host "Isolation Type: $($network.AllowedTrafficTypes)"
+                    $VMConnect = $network | Get-VMNetworkAdapter | ForEach-Object { $_.VMName }
+                    Write-Host "Connected VMs: $($VMConnect -join ', ')"
+                    Write-Host "-----------------------"
+                }
+                Read-Host "Press 'Enter' when Done"
+            }
+            HyperV
             }
 
         "7" {
