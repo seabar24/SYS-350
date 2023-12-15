@@ -1,28 +1,4 @@
-﻿# Script for creating linked clone
-#cls
-#$LinkedCloneName = Read-Host -Prompt "Enter the name of your Linked Clone VM"
-#$Snapshot = Read-Host -Prompt "Enter the name for your base VM's Snapshot"
-#cls
-
-# Creates snapshot for base VM
-#Write-Host "Creating Snapshot..."
-#Sleep 3
-#Checkpoint-VM -Name Windows11-Super1 -SnapshotName 
-#Write-Host "Done!"
-#cls
-
-# Creates Linked Clone
-#Write-Host "Creating Linked Clone, wait a few moments..."
-#Sleep 5
-#New-VM -Name $LinkedCloneName -Path C:\ProgramData\Microsoft\Windows\Hyper-V\ -VHDPath C:\Users\Public\Documents\Hyper-V\Virtual_hard_disks\winchild11.vhdx -Generation 2 -SwitchName "HyperV-WAN"
-#Write-Host "Done! VM: $LinkedCloneName will start in a few moments..."
-#Sleep 3
-#Start-VM -Name $LinkedCloneName
-#cls
-#Write-Host "$LinkedCloneName is running."
-#Write-Host " "
-
-# Function to Automate Hyper-V 
+﻿# Function to Automate Hyper-V 
 function HyperV() {
 # Menu to Automate Hyper-V
 cls
@@ -143,7 +119,7 @@ function checkVM ($VM) {
                 Start-VM -Name $LinkedCloneName
                 cls
                 Write-Host "$LinkedCloneName is running."
-                Write-Host " "
+                sleep 3
                 HyperV
             } else {
                 HyperV
@@ -163,24 +139,39 @@ function checkVM ($VM) {
                 Write-Host "0 Networks Found."
 
             } else {
-
                 Write-Host "List of Networks:`n"
                 foreach ($network in $networks) {
                     Write-Host "Network Name: $($network.Name)"
                     Write-Host "Switch Type: $($network.SwitchType)"
-                    $isolationType = (Get-VMNetwork -Id $network.Id).IsolationType
-                    Write-Host "Isolation Type: $($isolationType)"
                     $VMConnect = Get-VM | Where-Object { $_.NetworkAdapters | ForEach-Object { $_.SwitchId -eq $network.Id } } | ForEach-Object { $_.Name }
                     Write-Host "Connected VMs: $($VMConnect -join ', ')"
                     Write-Host "-----------------------"
                 }
-                Read-Host "Press 'Enter' when Done"
-            }
-            HyperV
+                Write-Host "`nCurrent VM Selected: $VMName"
+                $changeNetwork = Read-Host -Prompt "Enter the Network you want to change to"
+
+                cls
+                Write-Host "Changing Network Adapter..."
+                sleep 3
+                Get-VMNetworkAdapter -VMName $VMName | Connect-VMNetworkAdapter -SwitchName $changeNetwork
+                Read-Host "Done!"
+                Sleep 3
+                }
+             HyperV
             }
 
         "7" {
         #Delete a VM from Disk
+            cls
+            $VMName = Read-Host -Prompt "Enter the name of a VM you want to Delete"
+            cls
+            checkVM $VMName
+
+            Write-Host "Deleting VM.."
+            Sleep 3
+            Remove-VM -Name $VMName
+            Write-Host "Done!"
+            HyperV
             }
 
         "42" {
