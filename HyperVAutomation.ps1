@@ -39,10 +39,10 @@ function checkVM ($VM) {
             checkVM $vmchosen
 
             $vmInfo = Get-VM -Name $vmchosen
-            $memory = $vmInfo.MemoryAssigned
+            $memory = Get-VMMemory -VMName $vmchosen | Select-Object Startup
             $processor = $vmInfo.ProcessorCount
-            $network = $vmInfo.NetworkAdapters
-            $IntServ = $vmInfo.IntegrationServicesVersion
+            $network = Get-VMNetworkAdapter -VMName $vmchosen | Select-Object SwitchName
+            $IntServ = Get-VMIntegrationService -VMName Windows11-Super1 | Select-Object Name
             
             Write-Host "Name = $vmchosen"
             Write-Host "Memory Assigned = $memory"
